@@ -166,7 +166,7 @@ impl BlockBasedTableOptions {
     /// If non-NULL use the specified cache for blocks.
     ///
     /// If NULL, rocksdb will automatically create and use an 8MB internal cache.
-    pub fn block_cache(self, val: Option<Cache>) -> Self {
+    pub fn block_cache(self, val: Option<&Cache>) -> Self {
         unsafe {
             let ptr = val.map(|c| c.raw()).unwrap_or_else(ptr::null_mut);
             ll::rocks_block_based_table_options_set_block_cache(self.raw, ptr);
@@ -189,7 +189,7 @@ impl BlockBasedTableOptions {
     /// If non-NULL use the specified cache for compressed blocks.
     ///
     /// If NULL, rocksdb will not use a compressed block cache.
-    pub fn block_cache_compressed(self, val: Option<Cache>) -> Self {
+    pub fn block_cache_compressed(self, val: Option<&Cache>) -> Self {
         unsafe {
             let ptr = val.map(|c| c.raw()).unwrap_or_else(ptr::null_mut);
             ll::rocks_block_based_table_options_set_block_cache_compressed(self.raw, ptr);
