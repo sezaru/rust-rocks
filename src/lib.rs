@@ -31,6 +31,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 pub mod advanced_options;
 pub mod backup_engine;
+pub mod backup_info;
 pub mod backupable_db_options;
 pub mod cache;
 pub mod compaction_filter;

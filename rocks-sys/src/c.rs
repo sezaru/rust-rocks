@@ -22,6 +22,11 @@ pub struct rocks_db_t {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct rocks_backup_info_t {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct rocks_backup_engine_t {
     _unused: [u8; 0],
 }
@@ -2678,12 +2683,6 @@ extern "C" {
 extern "C" {
     pub fn rocks_backup_engine_open(
         options: *const rocks_backupable_db_options_t,
-        status: *mut *mut rocks_status_t
-    ) -> *mut rocks_backup_engine_t;
-}
-extern "C" {
-    pub fn rocks_backup_engine_open_with_db_env(
-        options: *const rocks_backupable_db_options_t,
         env: *const rocks_env_t,
         status: *mut *mut rocks_status_t
     ) -> *mut rocks_backup_engine_t;
@@ -2711,12 +2710,45 @@ extern "C" {
 extern "C" {
     pub fn rocks_backup_engine_purge_old_backups(
         engine: *mut rocks_backup_engine_t,
-        num_backups_to_keep: usize,
+        num_backups_to_keep: u32,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
+    pub fn rocks_backup_engine_delete_backup(
+        engine: *mut rocks_backup_engine_t,
+        backup_id: u32,
         status: *mut *mut rocks_status_t
     );
 }
 extern "C" {
     pub fn rocks_backup_engine_stop_backup(engine: *mut rocks_backup_engine_t);
+}
+extern "C" {
+    pub fn rocks_backup_engine_get_backup_info_size(engine: *mut rocks_backup_engine_t) -> usize;
+}
+extern "C" {
+    pub fn rocks_backup_engine_get_backup_info(
+        engine: *mut rocks_backup_engine_t,
+        backup_infos: *mut *mut rocks_backup_info_t,
+        backup_infos_size: usize,
+    ) -> u8;
+}
+// extern "C" {
+//     pub fn rocks_backup_engine_get_corrupted_backups(
+//         engine: *mut rocks_backup_engine_t,
+//         corrupt_backup_ids: *mut *mut u32
+//     );
+// }
+extern "C" {
+    pub fn rocks_backup_engine_restore_db_from_backup(
+        engine: *mut rocks_backup_engine_t,
+        options: *const rocks_restore_options_t,
+        backup_id: u32,
+        db_dir: *const ::std::os::raw::c_char,
+        wal_dir: *const ::std::os::raw::c_char,
+        status: *mut *mut rocks_status_t
+    );
 }
 extern "C" {
     pub fn rocks_backup_engine_restore_db_from_latest_backup(
@@ -2728,7 +2760,34 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn rocks_backup_engine_verify_backup(
+        engine: *mut rocks_backup_engine_t,
+        backup_id: u32,
+        verify_with_checksum: ::std::os::raw::c_uchar,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
     pub fn rocks_backup_engine_garbage_collect(engine: *mut rocks_backup_engine_t);
+}
+extern "C" {
+    pub fn rocks_backup_info_destroy(info: *const rocks_backup_info_t);
+}
+
+extern "C" {
+    pub fn rocks_backup_info_get_backup_id(info: *const rocks_backup_info_t) -> u32;
+}
+extern "C" {
+    pub fn rocks_backup_info_get_timestamp(info: *const rocks_backup_info_t) -> i64;
+}
+extern "C" {
+    pub fn rocks_backup_info_get_size(info: *const rocks_backup_info_t) -> u64;
+}
+extern "C" {
+    pub fn rocks_backup_info_get_number_files(info: *const rocks_backup_info_t) -> u32;
+}
+extern "C" {
+    pub fn rocks_backup_info_get_app_metadata(info: *const rocks_backup_info_t) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn rocks_backupable_db_options_create(
@@ -2752,12 +2811,12 @@ extern "C" {
         share_table_files: ::std::os::raw::c_uchar
     );
 }
-extern "C" {
-    pub fn rocks_backupable_db_options_set_info_log(
-        options: *mut rocks_backupable_db_options_t,
-        l: *mut rocks_logger_t
-    );
-}
+// extern "C" {
+//     pub fn rocks_backupable_db_options_set_info_log(
+//         options: *mut rocks_backupable_db_options_t,
+//         l: *mut rocks_logger_t
+//     );
+// }
 extern "C" {
     pub fn rocks_backupable_db_options_sync(
         options: *mut rocks_backupable_db_options_t,

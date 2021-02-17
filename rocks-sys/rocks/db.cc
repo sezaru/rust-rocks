@@ -866,28 +866,4 @@ cxx_string_vector_t* rocks_db_get_info_log_list(rocks_db_t* db, rocks_status_t**
   }
 }
 */
-
-rocks_backup_engine_t* rocks_backup_engine_open(const rocks_backupable_db_options_t* options, rocks_status_t** status) {
-  BackupEngine * be = nullptr;
-  auto st = BackupEngine::Open(options->rep, nullptr, &be);
-  if (SaveError(status, std::move(st))) {
-    return nullptr;
-  } else {
-    rocks_backup_engine_t* result = new rocks_backup_engine_t;
-    result->rep = be;
-    return result;
-  }
-}
-
-rocks_backup_engine_t* rocks_backup_engine_open_with_db_env(const rocks_backupable_db_options_t* options, rocks_env_t* env, rocks_status_t** status) {
-  BackupEngine * be = nullptr;
-  auto st = BackupEngine::Open(options->rep, env->rep, &be);
-  if (SaveError(status, std::move(st))) {
-    return nullptr;
-  } else {
-    rocks_backup_engine_t* result = new rocks_backup_engine_t;
-    result->rep = be;
-    return result;
-  }
-}
 }

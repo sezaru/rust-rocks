@@ -1,10 +1,10 @@
 use std::path::Path;
 use std::ptr;
 use std::u64;
+use std::ffi::CString;
 
 use rocks_sys as ll;
 
-use crate::env::Logger;
 use crate::rate_limiter::RateLimiter;
 
 use crate::to_raw::{FromRaw, ToRaw};
@@ -34,12 +34,11 @@ impl Drop for BackupableDBOptions {
 }
 
 impl BackupableDBOptions {
-    /// Create BackupableDBOptions with default values for all fields
-    pub fn new<P: AsRef<Path>>(path: P) -> BackupableDBOptions {
+    pub fn new(path: &str) -> BackupableDBOptions {
         BackupableDBOptions {
             raw: unsafe {
-                let path_str = path.as_ref().to_str().unwrap();
-                ll::rocks_backupable_db_options_create(path_str.as_ptr() as _)
+                let path_str = CString::new(path).unwrap();
+                ll::rocks_backupable_db_options_create(path_str.as_ptr())
             },
         }
     }
@@ -63,16 +62,16 @@ impl BackupableDBOptions {
         self
     }
 
-    pub fn info_log(self, val: Option<Logger>) -> Self {
-        unsafe {
-            if let Some(logger) = val {
-                ll::rocks_backupable_db_options_set_info_log(self.raw, logger.raw());
-            } else {
-                ll::rocks_backupable_db_options_set_info_log(self.raw, ptr::null_mut());
-            }
-        }
-        self
-    }
+    // pub fn info_log(self, val: Option<Logger>) -> Self {
+    //     unsafe {
+    //         if let Some(logger) = val {
+    //             ll::rocks_backupable_db_options_set_info_log(self.raw, logger.raw());
+    //         } else {
+    //             ll::rocks_backupable_db_options_set_info_log(self.raw, ptr::null_mut());
+    //         }
+    //     }
+    //     self
+    // }
 
     pub fn sync(self, val: bool) -> Self {
         unsafe {

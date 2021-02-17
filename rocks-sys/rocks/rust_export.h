@@ -23,6 +23,8 @@ extern void rust_string_assign(void* s, const char* p, size_t len);
 
 extern void rust_vec_u8_assign(void* v, const char* p, size_t len);
 
+extern void rust_vec_backup_info_assign(void* v, const rocksdb::BackupInfo* p, size_t len);
+
 /* compaction filter */
 extern int rust_compaction_filter_call(void* f, int level,
                                        const Slice* key,  // &&[u8]

@@ -20,6 +20,7 @@ typedef struct rocks_column_family_handle_t rocks_column_family_handle_t;
 typedef struct rocks_db_t rocks_db_t;
 
 /* backupable_db.h */
+typedef struct rocks_backup_info_t rocks_backup_info_t;
 typedef struct rocks_backup_engine_t rocks_backup_engine_t;
 typedef struct rocks_backupable_db_options_t rocks_backupable_db_options_t;
 typedef struct rocks_create_backup_options_t rocks_create_backup_options_t;
@@ -1245,9 +1246,7 @@ void rocks_sst_file_writer_finish(rocks_sst_file_writer_t* writer, rocks_externa
 uint64_t rocks_sst_file_writer_file_size(rocks_sst_file_writer_t* writer);
 
 /* backup */
-rocks_backup_engine_t* rocks_backup_engine_open(const rocks_backupable_db_options_t* options, rocks_status_t** status);
-
-rocks_backup_engine_t* rocks_backup_engine_open_with_db_env(const rocks_backupable_db_options_t* options, rocks_env_t* env, rocks_status_t** status);
+rocks_backup_engine_t* rocks_backup_engine_open(const rocks_backupable_db_options_t* options, rocks_env_t* env, rocks_status_t** status);
 
 void rocks_backup_engine_destroy(rocks_backup_engine_t* engine);
 
@@ -1257,12 +1256,37 @@ void rocks_backup_engine_create_new_backup_with_metadata(rocks_backup_engine_t* 
 
 void rocks_backup_engine_purge_old_backups(rocks_backup_engine_t* engine, uint32_t num_backups_to_keep, rocks_status_t** status);
 
+void rocks_backup_engine_delete_backup(rocks_backup_engine_t* engine, uint32_t backup_id, rocks_status_t** status);
+
 void rocks_backup_engine_stop_backup(rocks_backup_engine_t* engine);
+
+size_t  rocks_backup_engine_get_backup_info_size(rocks_backup_engine_t* engine);
+
+unsigned char rocks_backup_engine_get_backup_info(rocks_backup_engine_t* engine, rocks_backup_info_t** backup_infos, size_t backup_infos_size);
+
+// void rocks_backup_engine_get_corrupted_backups(rocks_backup_engine_t* engine, uint32_t** corrupt_backup_ids);
+
+void rocks_backup_engine_restore_db_from_backup(rocks_backup_engine_t* engine, const rocks_restore_options_t* options, uint32_t backup_id, const char* db_dir,
+                                                const char* wal_dir, rocks_status_t** status);
 
 void rocks_backup_engine_restore_db_from_latest_backup(rocks_backup_engine_t* engine, const rocks_restore_options_t* options, const char* db_dir, const char* wal_dir,
                                                        rocks_status_t** status);
 
+void rocks_backup_engine_verify_backup(rocks_backup_engine_t* engine, const uint32_t backup_id, unsigned char verify_with_checksum, rocks_status_t** status);
+
 void rocks_backup_engine_garbage_collect(rocks_backup_engine_t* engine);
+
+void rocks_backup_info_destroy(const rocks_backup_info_t* info);
+
+uint32_t rocks_backup_info_get_backup_id(const rocks_backup_info_t* info);
+
+int64_t rocks_backup_info_get_timestamp(const rocks_backup_info_t* info);
+
+uint64_t rocks_backup_info_get_size(const rocks_backup_info_t* info);
+
+uint32_t rocks_backup_info_get_number_files(const rocks_backup_info_t* info);
+
+const char* rocks_backup_info_get_app_metadata(const rocks_backup_info_t* info);
 
 rocks_backupable_db_options_t* rocks_backupable_db_options_create(const char* dir);
 
@@ -1272,7 +1296,7 @@ void rocks_backupable_db_options_backup_dir(rocks_backupable_db_options_t* opt, 
 
 void rocks_backupable_db_options_share_table_files(rocks_backupable_db_options_t* opt, unsigned char share_table_files);
 
-void rocks_backupable_db_options_options_set_info_log(rocks_backupable_db_options_t* opt, rocks_logger_t* l);
+// void rocks_backupable_db_options_options_set_info_log(rocks_backupable_db_options_t* opt, rocks_logger_t* l);
 
 void rocks_backupable_db_options_sync(rocks_backupable_db_options_t* opt, unsigned char sync);
 

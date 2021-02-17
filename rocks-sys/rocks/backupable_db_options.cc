@@ -7,14 +7,14 @@ using namespace ROCKSDB_NAMESPACE;
 extern "C" {
 
 rocks_backupable_db_options_t* rocks_backupable_db_options_create(const char* dir) {
-  auto opt = new rocks_backupable_db_options_t;
+  auto opt = BackupableDBOptions(dir);
 
-  opt->rep = BackupableDBOptions(dir);
-
-  return opt;
+  return new rocks_backupable_db_options_t{ .rep = opt };
 }
 
-void rocks_backupable_db_options_destroy(rocks_backupable_db_options_t* options) { delete options; }
+void rocks_backupable_db_options_destroy(rocks_backupable_db_options_t* options) {
+  delete options;
+}
 
 void rocks_backupable_db_options_backup_dir(rocks_backupable_db_options_t* opt, const char* dir) { opt->rep.backup_dir = dir; }
 
@@ -22,11 +22,11 @@ void rocks_backupable_db_options_share_table_files(rocks_backupable_db_options_t
   opt->rep.share_table_files = share_table_files;
 }
 
-void rocks_backupable_db_options_options_set_info_log(rocks_backupable_db_options_t* opt, rocks_logger_t* l) {
-  if (l) {
-    opt->rep.info_log = l->rep;
-  }
-}
+// void rocks_backupable_db_options_options_set_info_log(rocks_backupable_db_options_t* opt, rocks_logger_t* l) {
+//   if (l) {
+//     opt->rep.info_log = l->rep;
+//   }
+// }
 
 void rocks_backupable_db_options_sync(rocks_backupable_db_options_t* opt, unsigned char sync) {
   opt->rep.sync = sync;
@@ -41,7 +41,7 @@ void rocks_backupable_db_options_backup_log_files(rocks_backupable_db_options_t*
 }
 
 void rocks_backupable_db_options_backup_rate_limit(rocks_backupable_db_options_t* opt, uint64_t backup_rate_limit) {
-  opt->rep.backup_rate_limit = backup_rate_limit
+  opt->rep.backup_rate_limit = backup_rate_limit;
 }
 
 void rocks_backupable_db_options_set_backup_ratelimiter(rocks_backupable_db_options_t* opt, rocks_ratelimiter_t* limiter) {
@@ -53,7 +53,7 @@ void rocks_backupable_db_options_set_backup_ratelimiter(rocks_backupable_db_opti
 }
 
 void rocks_backupable_db_options_restore_rate_limit(rocks_backupable_db_options_t* opt, uint64_t restore_rate_limit) {
-  opt->rep.restore_rate_limit = restore_rate_limit
+  opt->rep.restore_rate_limit = restore_rate_limit;
 }
 
 void rocks_backupable_db_options_set_restore_ratelimiter(rocks_backupable_db_options_t* opt, rocks_ratelimiter_t* limiter) {
@@ -90,7 +90,9 @@ rocks_create_backup_options_t* rocks_create_backup_options_create() {
   return new rocks_create_backup_options_t;
 }
 
-void rocks_create_backup_options_destroy(rocks_create_backup_options_t* options) { delete options; }
+void rocks_create_backup_options_destroy(rocks_create_backup_options_t* options) {
+  delete options;
+}
 
 void rocks_create_backup_options_flush_before_backup(rocks_create_backup_options_t* opt, unsigned char flush_before_backup) {
   opt->rep.flush_before_backup = flush_before_backup;
@@ -113,5 +115,7 @@ rocks_restore_options_t* rocks_restore_options_create(unsigned char keep_log_fil
   return options;
 }
 
-void rocks_restore_options_destroy(rocks_restore_options_t* options) { delete options; }
+void rocks_restore_options_destroy(rocks_restore_options_t* options) {
+  delete options;
+}
 }

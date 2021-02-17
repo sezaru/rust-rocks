@@ -93,6 +93,9 @@ struct rocks_db_t {
 struct rocks_backup_engine_t {
   BackupEngine* rep;
 };
+struct rocks_backup_info_t {
+  BackupInfo rep;
+};
 
 /* options */
 struct rocks_dbpath_t {
