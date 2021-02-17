@@ -22,6 +22,11 @@ pub struct rocks_db_t {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
+pub struct rocks_backup_engine_t {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct rocks_cfoptions_t {
     _unused: [u8; 0],
 }
@@ -73,6 +78,21 @@ pub struct rocks_compactrange_options_t {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct rocks_ingestexternalfile_options_t {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct rocks_backupable_db_options_t {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct rocks_create_backup_options_t {
+    _unused: [u8; 0],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct rocks_restore_options_t {
     _unused: [u8; 0],
 }
 #[repr(C)]
@@ -2654,6 +2674,183 @@ extern "C" {
 }
 extern "C" {
     pub fn rocks_sst_file_writer_file_size(writer: *mut rocks_sst_file_writer_t) -> u64;
+}
+extern "C" {
+    pub fn rocks_backup_engine_open(
+        options: *const rocks_backupable_db_options_t,
+        status: *mut *mut rocks_status_t
+    ) -> *mut rocks_backup_engine_t;
+}
+extern "C" {
+    pub fn rocks_backup_engine_open_with_db_env(
+        options: *const rocks_backupable_db_options_t,
+        env: *const rocks_env_t,
+        status: *mut *mut rocks_status_t
+    ) -> *mut rocks_backup_engine_t;
+}
+extern "C" {
+    pub fn rocks_backup_engine_destroy(engine: *mut rocks_backup_engine_t);
+}
+extern "C" {
+    pub fn rocks_backup_engine_create_new_backup(
+        engine: *mut rocks_backup_engine_t,
+        options: *const rocks_create_backup_options_t,
+        db: *mut rocks_db_t,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
+    pub fn rocks_backup_engine_create_new_backup_with_metadata(
+        engine: *mut rocks_backup_engine_t,
+        options: *const rocks_create_backup_options_t,
+        db: *mut rocks_db_t,
+        app_metadata: *const ::std::os::raw::c_char,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
+    pub fn rocks_backup_engine_purge_old_backups(
+        engine: *mut rocks_backup_engine_t,
+        num_backups_to_keep: usize,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
+    pub fn rocks_backup_engine_stop_backup(engine: *mut rocks_backup_engine_t);
+}
+extern "C" {
+    pub fn rocks_backup_engine_restore_db_from_latest_backup(
+        engine: *mut rocks_backup_engine_t,
+        options: *const rocks_restore_options_t,
+        db_dir: *const ::std::os::raw::c_char,
+        wal_dir: *const ::std::os::raw::c_char,
+        status: *mut *mut rocks_status_t
+    );
+}
+extern "C" {
+    pub fn rocks_backup_engine_garbage_collect(engine: *mut rocks_backup_engine_t);
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_create(
+        dir: *const ::std::os::raw::c_char
+    ) -> *mut rocks_backupable_db_options_t;
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_destroy(
+        options: *mut rocks_backupable_db_options_t
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_backup_dir(
+        options: *mut rocks_backupable_db_options_t,
+        dir: *const ::std::os::raw::c_char
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_share_table_files(
+        options: *mut rocks_backupable_db_options_t,
+        share_table_files: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_set_info_log(
+        options: *mut rocks_backupable_db_options_t,
+        l: *mut rocks_logger_t
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_sync(
+        options: *mut rocks_backupable_db_options_t,
+        sync: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_destroy_old_data(
+        options: *mut rocks_backupable_db_options_t,
+        destroy_old_data: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_backup_log_files(
+        options: *mut rocks_backupable_db_options_t,
+        backup_log_files: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_backup_rate_limit(
+        options: *mut rocks_backupable_db_options_t,
+        backup_rate_limit: u64
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_set_backup_ratelimiter(
+        options: *mut rocks_backupable_db_options_t,
+        limiter: *mut rocks_ratelimiter_t
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_restore_rate_limit(
+        options: *mut rocks_backupable_db_options_t,
+        restore_rate_limit: u64
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_set_restore_ratelimiter(
+        options: *mut rocks_backupable_db_options_t,
+        limiter: *mut rocks_ratelimiter_t
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_share_files_with_checksum(
+        options: *mut rocks_backupable_db_options_t,
+        share_files_with_checksum: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_max_background_operations(
+        options: *mut rocks_backupable_db_options_t,
+        max_background_operations: ::std::os::raw::c_int
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_callback_trigger_interval_size(
+        options: *mut rocks_backupable_db_options_t,
+        callback_trigger_interval_size: u64
+    );
+}
+extern "C" {
+    pub fn rocks_backupable_db_options_max_valid_backups_to_open(
+        options: *mut rocks_backupable_db_options_t,
+        max_valid_backups_to_open: ::std::os::raw::c_int
+    );
+}
+extern "C" {
+    pub fn rocks_create_backup_options_create() -> *mut rocks_create_backup_options_t;
+}
+extern "C" {
+    pub fn rocks_create_backup_options_destroy(
+        options: *mut rocks_create_backup_options_t
+    );
+}
+extern "C" {
+    pub fn rocks_create_backup_options_flush_before_backup(
+        options: *mut rocks_create_backup_options_t,
+        flush_before_backup: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_create_backup_options_decrease_background_thread_cpu_priority(
+        options: *mut rocks_create_backup_options_t,
+        decrease_background_thread_cpu_priority: ::std::os::raw::c_uchar
+    );
+}
+extern "C" {
+    pub fn rocks_restore_options_create(keep_log_files: ::std::os::raw::c_uchar) -> *mut rocks_restore_options_t;
+}
+extern "C" {
+    pub fn rocks_restore_options_destroy(
+        options: *mut rocks_restore_options_t
+    );
 }
 extern "C" {
     pub fn rocks_comparator_bytewise() -> *const rocks_c_comparator_t;

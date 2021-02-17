@@ -30,6 +30,8 @@ pub use error::Error;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub mod advanced_options;
+pub mod backup_engine;
+pub mod backupable_db_options;
 pub mod cache;
 pub mod compaction_filter;
 pub mod compaction_job_stats;

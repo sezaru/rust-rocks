@@ -25,6 +25,7 @@
 #include "rocksdb/table_properties.h"
 #include "rocksdb/transaction_log.h"
 #include "rocksdb/utilities/debug.h"
+#include "rocksdb/utilities/backupable_db.h"
 #include "rocksdb/write_buffer_manager.h"
 #include "rust_export.h"
 
@@ -88,6 +89,11 @@ struct rocks_db_t {
   DB* rep;
 };
 
+/* Backup */
+struct rocks_backup_engine_t {
+  BackupEngine* rep;
+};
+
 /* options */
 struct rocks_dbpath_t {
   DbPath rep;
@@ -124,6 +130,15 @@ struct rocks_compactrange_options_t {
 };
 struct rocks_ingestexternalfile_options_t {
   IngestExternalFileOptions rep;
+};
+struct rocks_backupable_db_options_t {
+  BackupableDBOptions rep;
+};
+struct rocks_create_backup_options_t {
+  CreateBackupOptions rep;
+};
+struct rocks_restore_options_t {
+  RestoreOptions rep;
 };
 
 struct rocks_mergeoperator_t : public MergeOperator {
