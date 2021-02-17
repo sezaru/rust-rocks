@@ -2219,7 +2219,7 @@ impl DBOptions {
     /// Not supported in ROCKSDB_LITE mode!
     ///
     /// Rust: will move in and use share_ptr
-    pub fn row_cache(self, val: Option<Cache>) -> Self {
+    pub fn row_cache(self, val: Option<&Cache>) -> Self {
         unsafe {
             if let Some(cache) = val {
                 ll::rocks_dboptions_set_row_cache(self.raw, cache.raw());
