@@ -183,7 +183,7 @@ impl BackupEngineRef {
         Error::from_ll(status)
     }
 
-     pub fn engine_garbage_collect(&self) {
+     pub fn garbage_collect(&self) {
          unsafe {ll::rocks_backup_engine_garbage_collect(self.raw());}
     }
 }
